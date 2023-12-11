@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extension: [], userRemoteConfigs: [[url: 'https://github.com/Shreyanshp-3/Dashboard_Hirequotient_T1.git']])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    build job: 'Cdpipeline', wait: false
+                }
+            }
+        }
+
+        stage('Dev Deploy') {
+            steps {
+                script {
+                    deploy adapters: [tomcat9(credentialsId: 'c149d84f-98d9-4683-8d02-44bb7b915075', path: '', url: 'http://localhost:8080/manager/text')],
+                           context: ['**/*.war']
+                }
+            }
+        }
+    }
+}
